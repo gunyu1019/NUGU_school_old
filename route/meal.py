@@ -26,13 +26,13 @@ async def meal(request):
     version = parameters.get('version')
 
     if "parameters" in action or action is None:
-        if action['parameters']['KEY']['value'] != "nugu_project_20210128":
+        if action['parameters']['KEY']['value'] != parser.get('TOKEN', 'key'):
             return forbidden
     else:
         return forbidden
     params = action['parameters']
 
-    school_name = params['school_name']['value']
+    school_name = params['meal_name']['value']
     header1 = {
         'SCHUL_NM': str(school_name),
         'Type': 'json',
@@ -54,7 +54,7 @@ async def meal(request):
     sc_code = school_info[0]["ATPT_OFCDC_SC_CODE"]
     sd_code = school_info[0]["SD_SCHUL_CODE"]
 
-    date, date_answer = check_date(params=params['day']['value'])
+    date, date_answer = check_date(params=params['meal_day']['value'])
     if date is None:
         return response.json(get_error("day_not_found", version), status=200)
     header2 = {
@@ -87,8 +87,8 @@ async def meal(request):
         "version": version,
         "resultCode": "OK",
         "output": {
-            "status": read_food(food),
-            "date": date_answer
+            "meal_status": read_food(food),
+            "meal_date": date_answer
         }
     }
 

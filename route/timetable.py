@@ -20,7 +20,7 @@ async def timetable(request):
     version = parameters.get('version')
 
     if "parameters" in action or action is None:
-        if action['parameters']['KEY']['value'] != "nugu_project_20210128":
+        if action['parameters']['KEY']['value'] != parser.get('TOKEN', 'key'):
             return forbidden
     else:
         return forbidden
