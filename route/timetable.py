@@ -4,7 +4,7 @@ from sanic import response
 
 from module.request import requests
 from module.check_date import check_date
-from module.get_error import get_error, forhidden
+from module.get_error import get_error, forbidden
 
 from config import parser
 
@@ -14,16 +14,16 @@ type_list = {"초등학교": "els", "중학교": "mis", "고등학교": "his", "
 
 async def timetable(request):
     if request.body == b"":
-        return forhidden
+        return forbidden
     parameters = json.loads(request.body.decode())
     action = parameters.get('action')
     version = parameters.get('version')
 
     if "parameters" in action or action is None:
         if action['parameters']['KEY']['value'] != "nugu_project_20210128":
-            return forhidden
+            return forbidden
     else:
-        return forhidden
+        return forbidden
     params = action['parameters']
 
     school_name = params['timetable_name']['value']
