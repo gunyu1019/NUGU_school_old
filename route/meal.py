@@ -4,7 +4,7 @@ from sanic import response
 
 from module.request import requests
 from module.check_date import check_date
-from module.get_error import get_error, forhidden
+from module.get_error import get_error, forbidden
 
 from config import parser
 
@@ -13,26 +13,26 @@ def read_food(food):
     answer = ", ".join(food_list)
     for i in range(20, 0, -1):
         answer = answer.replace(f"{i}.", "")
-    return answer.replace(".","")
+    return answer
 
 base = "https://open.neis.go.kr/hub/"
 neis_token = parser.get('TOKEN', 'token')
 
 async def meal(request):
     if request.body == b"":
-        return forhidden
+        return forbidden
     parameters = json.loads(request.body.decode())
     action = parameters.get('action')
     version = parameters.get('version')
 
     if "parameters" in action or action is None:
         if action['parameters']['KEY']['value'] != "nugu_project_20210128":
-            return forhidden
+            return forbidden
     else:
-        return forhidden
+        return forbidden
     params = action['parameters']
 
-    school_name = params['meal_name']['value']
+    school_name = params['school_name']['value']
     header1 = {
         'SCHUL_NM': str(school_name),
         'Type': 'json',
@@ -54,7 +54,7 @@ async def meal(request):
     sc_code = school_info[0]["ATPT_OFCDC_SC_CODE"]
     sd_code = school_info[0]["SD_SCHUL_CODE"]
 
-    date, date_answer = check_date(params=params['meal_day']['value'])
+    date, date_answer = check_date(params=params['day']['value'])
     if date is None:
         return response.json(get_error("day_not_found", version), status=200)
     header2 = {
@@ -87,8 +87,9 @@ async def meal(request):
         "version": version,
         "resultCode": "OK",
         "output": {
-            "meal_status": read_food(food),
-            "meal_date": date_answer
+            "status": read_food(food),
+            "date": date_answer
         }
     }
+
     return response.json(data)
